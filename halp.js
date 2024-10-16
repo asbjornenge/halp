@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // evaluate.js
 import OpenAI from 'openai';
 import fs from 'fs';

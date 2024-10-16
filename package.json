@@ -2,11 +2,11 @@
   "name": "@asbjornenge/halp",
   "type": "module",
   "version": "1.0.0",
-  "main": "halp.js",
   "bin": {
     "halp": "halp.js"
   },
   "scripts": {
+    "start": "node halp.js",
     "cli": "node halp.js"
   },
   "author": "",
@@ -16,3 +16,4 @@
     "openai": "^4.67.3"
   }
 }
+
