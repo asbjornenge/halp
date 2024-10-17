@@ -49,11 +49,27 @@ function getProjectContext() {
 async function buildPrompt(files) {
   let context = '';
   files.forEach((file) => {
-    context += `File: ${file.filename}\nContent:\n${file.content}\n\n`;
+    context += `
+---
+Filename: ${file.filename}
+${file.content}
+---
+
+`;
   });
 
   const prompt = `
-You are an expert Node.js developer. Based on the following project context, perform the instruction provided.
+You are an expert Node.js and JavaScript developer.
+
+**Important Instructions**:
+- **Provide the full code for any files that you create or modify.**
+- **Only provide files that have changes.**
+- **Do NOT wrap code in \`\`\` blocks.**
+- **Follow the code style and structure of the provided context**
+- **Do not add any new comments.**
+- **Preserve all existing code comments exactly as they are. Do not remove any comments from the original code.**
+
+Based on the following project context, perform the instruction provided.
 
 Instruction:
 ${instruction}
@@ -61,17 +77,35 @@ ${instruction}
 Project Context:
 ${context}
 
-Provide the updated code for any files that need changes. For each file to be changed, create a block with the following syntax: 
+For each file to be changed or created, create a block with the exact following syntax:
 
-\`\`\`
+---
 Filename: <filename>
 <updated code>
-\`\`\`
-
-Only provide files that have changes. 
-Do not wrap code in \`\`\` separate blocks.
-Do not provide code comments.
+---
 `;
+
+//  const prompt = `
+//You are an expert Node.js developer. Based on the following project context, perform the instruction provided.
+//
+//Instruction:
+//${instruction}
+//
+//Project Context:
+//${context}
+//
+//For each file to be changed, create a block with the following syntax: 
+//
+//---
+//Filename: <filename>
+//<updated code>
+//---
+//
+//Provide the full code for any files that you create or modify. 
+//Only provide files that have changes.
+//You must NOT wrap code in \`\`\` blocks.
+//Keep my code comments intact, but don't add any new comments in your modifications or when creating new code.
+//`;
 
   return prompt;
 }
@@ -79,7 +113,7 @@ Do not provide code comments.
 // Function to apply changes from LLM response
 function applyChanges(responseText) {
   console.log(responseText)
-  const fileSections = responseText.split('```').filter((section) => section.trim());
+  const fileSections = responseText.split('---').filter((section) => section.trim());
   fileSections.forEach((section) => {
     const lines = section.split('\n');
     const filenameLine = lines[1];
