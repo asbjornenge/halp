@@ -154,15 +154,16 @@ function applyChanges(responseText) {
     const prompt = await buildPrompt(files);
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // or 'gpt-3.5-turbo' if you prefer
+      model: args.m, 
       messages: [{ role: 'user', content: prompt }],
     });
 
     const result = response.choices[0].message.content;
     if (!args.s) console.log(result)
-    applyChanges(result);
-
-    console.log('Changes applied. Use git diff to review them.');
+    if (!args.d) { 
+      applyChanges(result)
+      console.log('Changes applied. Use git diff to review them.');
+    }
   } catch (error) {
     console.error('Error:', error);
   }
