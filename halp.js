@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
-import OpenAI from 'openai'
 import fs from 'fs'
 import path from 'path'
+import OpenAI from 'openai'
 import minimist from 'minimist'
+import { glob } from 'glob'
 
 const args = minimist(process.argv.slice(2), {
   boolean: ['d'],
@@ -20,7 +21,7 @@ const args = minimist(process.argv.slice(2), {
     h: false,
     m: 'gpt-4o-mini',
     s: false,
-    c: '*.js$,package.json',
+    c: '*.js,package.json',
     r: false
   }
 })
@@ -34,7 +35,7 @@ Options:
   -h, --help        Show help information
   -m, --model       Specify mode (default gpt-4o-mini)
   -s, --silent      Do not log the result to terminal 
-  -c, --context     Specify context (default *.js$,package.json in current folder only)
+  -c, --context     Specify context (default *.js,package.json in current folder only)
   -r, --recursive   Get context files recursively (coming soon)
 
 Positional Arguments:
@@ -65,24 +66,26 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-// Function to read files and build context
 function getProjectContext() {
   const files = [];
   const currentDir = process.cwd();
   const contextFiles = args.c.split(',').map(file => file.trim());
 
   contextFiles.forEach((pattern) => {
-    const regex = new RegExp(pattern.replace(/\*/g, '.*'));
-    const fileNames = fs.readdirSync(currentDir).filter(f => !f.startsWith('.'));
+    // Use glob to find files matching the pattern
+    const filePaths = glob.sync(pattern, {
+      cwd: currentDir,
+      nodir: true,      // Exclude directories
+      dot: false,       // Exclude files starting with a dot
+      absolute: true,   // Return absolute paths
+    });
 
-    fileNames.forEach((fileName) => {
-      if (regex.test(fileName)) {
-        const content = fs.readFileSync(path.join(currentDir, fileName), 'utf8');
-        files.push({
-          filename: fileName,
-          content: content,
-        });
-      }
+    filePaths.forEach((filePath) => {
+      const content = fs.readFileSync(filePath, 'utf8');
+      files.push({
+        filename: path.relative(currentDir, filePath), // Relative path from current directory
+        content: content,
+      });
     });
   });
 
@@ -90,7 +93,6 @@ function getProjectContext() {
   process.exit(1)
   return files;
 }
-
 
 // Prepare the prompt
 async function buildPrompt(files) {

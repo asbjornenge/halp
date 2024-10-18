@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "glob": "^11.0.0",
     "minimist": "^1.2.8",
     "openai": "^4.67.3"
   }
