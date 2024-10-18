@@ -89,8 +89,6 @@ function getProjectContext() {
     });
   });
 
-  console.log(files.map(f => f.filename))
-  process.exit(1)
   return files;
 }
 
