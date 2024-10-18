@@ -3,9 +3,56 @@
 import OpenAI from 'openai';
 import fs from 'fs';
 import path from 'path';
+import minimist from 'minimist';
 
-// Get the instruction from command-line arguments
-const instruction = process.argv.slice(2).join(' ');
+/* TODO:
+    * -d --dry (ikke overskriv filene, output only
+    * -m --model (spesifiser modell)
+    * -s --silent (do not log output to terminal)
+    * -c --context (specify context)
+*/
+
+const args = minimist(process.argv.slice(2), {
+  boolean: ['d'],
+  alias: { 
+    d: 'dry', 
+    h: 'help',
+    m: 'model',
+    c: 'context',
+    r: 'recursive'
+  },
+  default: {
+    d: false,
+    h: false,
+    m: 'gpt-4o-mini',
+    c: '*.js, *.json',
+    r: false
+  }
+})
+
+if (args.help) {
+  console.log(`
+Usage: halp [options] [instruction]
+
+Options:
+  -d, --dry         Dry run (do not overwrite files) 
+  -h, --help        Show help information
+  -m, --model       Specify mode (default gpt-4o-mini)
+  -c, --context     Specify context (default *.js, *.json in current folder only)
+  -r, --recursive   Get context files recursively
+
+Positional Arguments:
+  instruction       Tell the model what you need halp with (e.g., "Update the /yolo endpoint to handle form data")
+
+Examples:
+  halp -d -m gpt-3.5-turbo "Optimize the query for fetching users"
+  halp -c users.jsx "Update user listing by including the administrator parameter"
+  halp --help
+`)
+  process.exit(0)
+}
+
+const instruction = args._[0]
 
 if (!instruction) {
   console.error('Please provide an instruction.');
