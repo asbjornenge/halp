@@ -1,16 +1,9 @@
 #!/usr/bin/env node
-// evaluate.js
-import OpenAI from 'openai';
-import fs from 'fs';
-import path from 'path';
-import minimist from 'minimist';
 
-/* TODO:
-    * -d --dry (ikke overskriv filene, output only
-    * -m --model (spesifiser modell)
-    * -s --silent (do not log output to terminal)
-    * -c --context (specify context)
-*/
+import OpenAI from 'openai'
+import fs from 'fs'
+import path from 'path'
+import minimist from 'minimist'
 
 const args = minimist(process.argv.slice(2), {
   boolean: ['d'],
@@ -18,6 +11,7 @@ const args = minimist(process.argv.slice(2), {
     d: 'dry', 
     h: 'help',
     m: 'model',
+    s: 'silent',
     c: 'context',
     r: 'recursive'
   },
@@ -25,6 +19,7 @@ const args = minimist(process.argv.slice(2), {
     d: false,
     h: false,
     m: 'gpt-4o-mini',
+    s: false,
     c: '*.js, *.json',
     r: false
   }
@@ -38,6 +33,7 @@ Options:
   -d, --dry         Dry run (do not overwrite files) 
   -h, --help        Show help information
   -m, --model       Specify mode (default gpt-4o-mini)
+  -s, --silent      Do not log the result to terminal 
   -c, --context     Specify context (default *.js, *.json in current folder only)
   -r, --recursive   Get context files recursively
 
@@ -55,19 +51,19 @@ Examples:
 const instruction = args._[0]
 
 if (!instruction) {
-  console.error('Please provide an instruction.');
-  process.exit(1);
+  console.error('Please provide an instruction.')
+  process.exit(1)
 }
 
 if (!process.env.OPENAI_API_KEY) {
-  console.error('Missiong OPENAI_API_KEY env variable');
-  process.exit(1);
+  console.error('Missiong OPENAI_API_KEY env variable')
+  process.exit(1)
 }
 
 // Initialize OpenAI API
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
 // Function to read files and build context
 function getProjectContext() {
@@ -131,35 +127,11 @@ Filename: <filename>
 <updated code>
 ---
 `;
-
-//  const prompt = `
-//You are an expert Node.js developer. Based on the following project context, perform the instruction provided.
-//
-//Instruction:
-//${instruction}
-//
-//Project Context:
-//${context}
-//
-//For each file to be changed, create a block with the following syntax: 
-//
-//---
-//Filename: <filename>
-//<updated code>
-//---
-//
-//Provide the full code for any files that you create or modify. 
-//Only provide files that have changes.
-//You must NOT wrap code in \`\`\` blocks.
-//Keep my code comments intact, but don't add any new comments in your modifications or when creating new code.
-//`;
-
   return prompt;
 }
 
 // Function to apply changes from LLM response
 function applyChanges(responseText) {
-  console.log(responseText)
   const fileSections = responseText.split('---').filter((section) => section.trim());
   fileSections.forEach((section) => {
     const lines = section.split('\n');
@@ -187,6 +159,7 @@ function applyChanges(responseText) {
     });
 
     const result = response.choices[0].message.content;
+    if (!args.s) console.log(result)
     applyChanges(result);
 
     console.log('Changes applied. Use git diff to review them.');
