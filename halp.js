@@ -20,7 +20,7 @@ const args = minimist(process.argv.slice(2), {
     h: false,
     m: 'gpt-4o-mini',
     s: false,
-    c: '*.js, *.json',
+    c: '*.js$,package.json',
     r: false
   }
 })
@@ -34,8 +34,8 @@ Options:
   -h, --help        Show help information
   -m, --model       Specify mode (default gpt-4o-mini)
   -s, --silent      Do not log the result to terminal 
-  -c, --context     Specify context (default *.js, *.json in current folder only)
-  -r, --recursive   Get context files recursively
+  -c, --context     Specify context (default *.js$,package.json in current folder only)
+  -r, --recursive   Get context files recursively (coming soon)
 
 Positional Arguments:
   instruction       Tell the model what you need halp with (e.g., "Update the /yolo endpoint to handle form data")
@@ -69,24 +69,28 @@ const openai = new OpenAI({
 function getProjectContext() {
   const files = [];
   const currentDir = process.cwd();
+  const contextFiles = args.c.split(',').map(file => file.trim());
 
-  // Read all files in the current directory
-  const fileNames = fs.readdirSync(currentDir);
+  contextFiles.forEach((pattern) => {
+    const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+    const fileNames = fs.readdirSync(currentDir).filter(f => !f.startsWith('.'));
 
-  // Filter for .js and .json files
-  fileNames.forEach((fileName) => {
-    const ext = path.extname(fileName);
-    if (ext === '.js' || ext === '.json') {
-      const content = fs.readFileSync(path.join(currentDir, fileName), 'utf8');
-      files.push({
-        filename: fileName,
-        content: content,
-      });
-    }
+    fileNames.forEach((fileName) => {
+      if (regex.test(fileName)) {
+        const content = fs.readFileSync(path.join(currentDir, fileName), 'utf8');
+        files.push({
+          filename: fileName,
+          content: content,
+        });
+      }
+    });
   });
 
+  console.log(files.map(f => f.filename))
+  process.exit(1)
   return files;
 }
+
 
 // Prepare the prompt
 async function buildPrompt(files) {
