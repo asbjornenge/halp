@@ -27,8 +27,7 @@ const args = minimist(process.argv.slice(2), {
 })
 
 if (args.help) {
-  console.log(`
-Usage: halp [options] [instruction]
+  console.log(`Usage: halp [options] [instruction]
 
 Options:
   -d, --dry         Dry run (do not overwrite files) 
