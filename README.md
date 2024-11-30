@@ -2,7 +2,7 @@
 
 Halp is a CLI tool that leverages OpenAI's GPT models to assist with modifying and updating your code.
 
-It is optimized for Node and JavaScript applications, but you can use it for anything by modifying it's context (-c flag). 
+It is optimized for Node and JavaScript applications, but you can use it for anything by modifying the context. 
 
 ## Features
 
