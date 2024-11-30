@@ -3,11 +3,10 @@
   "type": "module",
   "version": "1.0.0",
   "bin": {
-    "halp": "halp.js"
+    "halp": "index.js"
   },
   "scripts": {
-    "start": "node halp.js",
-    "cli": "node halp.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
