@@ -1,7 +1,7 @@
 {
   "name": "@asbjornenge/halp",
   "type": "module",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "bin": {
     "halp": "index.js"
   },
