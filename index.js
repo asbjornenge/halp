@@ -1,23 +1,28 @@
 #!/usr/bin/env node
-
 import fs from 'fs'
 import path from 'path'
 import OpenAI from 'openai'
 import minimist from 'minimist'
 import { glob } from 'glob'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const args = minimist(process.argv.slice(2), {
-  boolean: ['d'],
+  boolean: ['d','v'],
   alias: { 
     d: 'dry', 
     h: 'help',
     m: 'model',
     s: 'silent',
     c: 'context',
+    v: 'version',
     r: 'recursive'
   },
   default: {
     d: false,
+    v: false,
     h: false,
     m: 'gpt-4o-mini',
     s: false,
@@ -26,25 +31,17 @@ const args = minimist(process.argv.slice(2), {
   }
 })
 
+
+if (args.version) {
+  const pkgjson = fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8');
+  console.log(`Version: ${JSON.parse(pkgjson).version}`);
+  process.exit(0);
+}
+
 if (args.help) {
-  console.log(`Usage: halp [options] [instruction]
-
-Options:
-  -d, --dry         Dry run (do not overwrite files) 
-  -h, --help        Show help information
-  -m, --model       Specify mode (default gpt-4o-mini)
-  -s, --silent      Do not log the result to terminal 
-  -c, --context     Specify context (default *.js,package.json in current folder only)
-  -r, --recursive   Get context files recursively (coming soon)
-
-Positional Arguments:
-  instruction       Tell the model what you need halp with (e.g., "Update the /yolo endpoint to handle form data")
-
-Examples:
-  halp -d -m gpt-3.5-turbo "Optimize the query for fetching users"
-  halp -c users.jsx "Update user listing by including the administrator parameter"
-  halp --help
-`)
+  const readmeContent = fs.readFileSync(path.join(__dirname, 'README.md'), 'utf-8');
+  const usageSection = readmeContent.match(/## Usage[\s\S]*?```([\s\S]*?)```/);
+  console.log(usageSection[1].trim());
   process.exit(0)
 }
 

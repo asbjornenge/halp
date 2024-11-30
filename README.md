@@ -29,12 +29,13 @@ halp [options] [instruction]
 
 ### Options
 
-- -d, --dry         Dry run (do not overwrite files)
-- -h, --help        Show help information
-- -m, --model       Specify model (default 'gpt-4o-mini')
-- -s, --silent      Do not log the result to terminal
-- -c, --context     Specify context (default '*.js,package.json' in current folder only)
-- -r, --recursive   Get context files recursively (coming soon)
+-d, --dry         Dry run (do not overwrite files)
+-h, --help        Show help information
+-m, --model       Specify model (default 'gpt-4o-mini')
+-s, --silent      Do not log the result to terminal
+-c, --context     Specify context (default '*.js,package.json' in current folder only)
+-v, --version     Print version 
+-r, --recursive   Get context files recursively (coming soon)
 
 ### Examples
 
