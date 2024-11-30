@@ -4,13 +4,6 @@ Halp is a CLI tool that leverages OpenAI's GPT models to assist with modifying a
 
 It is optimized for Node and JavaScript applications, but you can use it for anything by modifying the context. 
 
-## Features
-
-- Automated Code Updates: Provide instructions in plain English, and Halp will update your project files accordingly.
-- Dry Run Mode: Preview changes without overwriting files.
-- Customizable Context: Specify which files to include as context for the modifications.
-- Specify model: You can specify what model you want to use 
-
 ## Installation
 
 Install globally using npm:
