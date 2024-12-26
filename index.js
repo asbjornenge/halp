@@ -141,6 +141,8 @@ function applyChanges(responseText) {
     if (filenameMatch) {
       const filename = filenameMatch[1].trim();
       const content = lines.slice(2).join('\n');
+      const dir = path.dirname(filename);
+      fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(filename, content, 'utf8');
       console.log(`Updated ${filename}`);
     }
