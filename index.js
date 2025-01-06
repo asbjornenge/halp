@@ -10,15 +10,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const args = minimist(process.argv.slice(2), {
-  boolean: ['d','v'],
+  boolean: ['d','v','h','s','l'],
   alias: { 
     d: 'dry', 
     h: 'help',
     m: 'model',
     s: 'silent',
     c: 'context',
+    l: 'listfiles',
     v: 'version',
-    r: 'recursive'
   },
   default: {
     d: false,
@@ -27,7 +27,7 @@ const args = minimist(process.argv.slice(2), {
     m: 'gpt-4o-mini',
     s: false,
     c: '*.js,package.json',
-    r: false
+    l: false,
   }
 })
 
@@ -153,6 +153,7 @@ function applyChanges(responseText) {
 (async () => {
   try {
     const files = getProjectContext();
+    if (args.l) return console.log(files.map(f => f?.filename).join('\n'));
     const prompt = await buildPrompt(files);
 
     const response = await openai.chat.completions.create({

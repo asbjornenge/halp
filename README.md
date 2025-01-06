@@ -34,8 +34,8 @@ halp [options] [instruction]
 -m, --model       Specify model (default 'gpt-4o-mini')
 -s, --silent      Do not log the result to terminal
 -c, --context     Specify context (default '*.js,package.json' in current folder only)
+-l, --listfiles   List all files that are part of the context
 -v, --version     Print version 
--r, --recursive   Get context files recursively (coming soon)
 
 ### Examples
 
