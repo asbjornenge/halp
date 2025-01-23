@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const args = minimist(process.argv.slice(2), {
-  boolean: ['d','v','h','s','l'],
+  boolean: ['d','v','h','s','l','p'],
   alias: { 
     d: 'dry', 
     h: 'help',
@@ -19,7 +19,8 @@ const args = minimist(process.argv.slice(2), {
     c: 'context',
     l: 'listfiles',
     v: 'version',
-    b: 'baseurl'
+    b: 'baseurl',
+    p: 'prompt'
   },
   default: {
     d: false,
@@ -29,7 +30,8 @@ const args = minimist(process.argv.slice(2), {
     s: false,
     c: '*.js,package.json',
     l: false,
-    b: 'https://api.openai.com/v1'
+    b: 'https://api.openai.com/v1',
+    p: false
   }
 })
 
@@ -127,7 +129,7 @@ For each file to be changed or created, create a block with the exact following 
 
 ---
 Filename: <filename>
-<updated code>
+<full updated code>
 ---
 `;
   return prompt;
@@ -158,6 +160,7 @@ function applyChanges(responseText) {
     const files = getProjectContext();
     if (args.l) return console.log(files.map(f => f?.filename).join('\n'));
     const prompt = await buildPrompt(files);
+    if (args.p) return console.log(prompt)
 
     const response = await openai.chat.completions.create({
       model: args.m, 
