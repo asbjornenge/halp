@@ -19,6 +19,7 @@ const args = minimist(process.argv.slice(2), {
     c: 'context',
     l: 'listfiles',
     v: 'version',
+    b: 'baseurl'
   },
   default: {
     d: false,
@@ -28,6 +29,7 @@ const args = minimist(process.argv.slice(2), {
     s: false,
     c: '*.js,package.json',
     l: false,
+    b: 'https://api.openai.com/v1'
   }
 })
 
@@ -60,6 +62,7 @@ if (!process.env.OPENAI_API_KEY) {
 // Initialize OpenAI API
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  baseURL: args.b 
 })
 
 function getProjectContext() {
